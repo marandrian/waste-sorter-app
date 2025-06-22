@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Pemilah Sampah</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Pemilah Sampah Otomatis</h1>
+
+      <div class="stats">
+        <div class="stat-card">
+          <h2>Logam Hari Ini</h2>
+          <div class="count">{{ metal_count }}</div>
+        </div>
+
+        <div class="stat-card">
+          <h2>Non-Logam Hari Ini</h2>
+          <div class="count">{{ non_metal_count }}</div>
+        </div>
+
+        <div class="stat-card">
+          <h2>Total Sampah</h2>
+          <div class="count">{{ total }}</div>
+        </div>
+      </div>
+
+      <div class="last-reset">
+        <p>Data terakhir direset: {{ last_reset.strftime('%d %B %Y') }}</p>
+      </div>
+
+      <div class="controls">
+        <h2>Kontrol Manual</h2>
+        <button onclick="sendCommand('metal')">Putar ke Logam</button>
+        <button onclick="sendCommand('non_metal')">Putar ke Non-Logam</button>
+        <button onclick="sendCommand('neutral')">Reset Posisi</button>
+      </div>
+    </div>
+
+    <script>
+      async function sendCommand(command) {
+        const response = await fetch("/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command: command }),
+        });
+
+        const result = await response.json();
+        alert(
+          result.status === "command received"
+            ? "Perintah dikirim!"
+            : "Gagal mengirim perintah"
+        );
+      }
+
+      // Auto-refresh data setiap 10 detik
+      setInterval(() => window.location.reload(), 10000);
+    </script>
+  </body>
+</html>
